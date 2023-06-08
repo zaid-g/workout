@@ -12,19 +12,14 @@ exercises = {0: "pushups", 1: "pullups", 2: "squats", 3: "jumprope"}
 today = datetime.date.today()
 while True:
     x = input(
-        f"""
-
-        {json.dumps(exercises, indent=4)}
-        Example format: `0z5,10,3,4` for {exercises[0]}, user z, and reps 5,10,3,4
-        Enter 'q' to finish.
-
-        """
+        f"Example format: `0z5,10,3,4` for {exercises[0]}, user z, and reps 5,10,3,4.\nEnter 'q' to save & finish.\n{json.dumps(exercises, indent=4)}\n"
     )
     if x == "q":
         break
     try:
         exercise = exercises[int(x[0])]
-        person = x[1]
+        person = x[1].lower()
+        assert person.isalpha()
         reps = x[2:]
         reps = reps.split(",")
         reps = [int(rep) for rep in reps]
@@ -36,9 +31,15 @@ while True:
                 "reps": rep,
             }
             hist.loc[len(hist)] = row
+        print("✅✅✅\n")
     except Exception as exc:
-        print(f"Invalid format: {exc}")
+        while True:
+            print(f"❌❌❌ERROR: invalid format: {exc}")
+            x = input("Please enter to continue.\n")
+            if x == '':
+                break
 
+# write
 hist.to_csv("history.csv", index=False)
 
 # %% -------- [calculate score for each person and exercise] ----------:
