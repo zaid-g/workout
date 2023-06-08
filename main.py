@@ -2,47 +2,42 @@ import pandas as pd
 import numpy as np
 import datetime
 from matplotlib import pyplot as plt
+import json
 
 
 hist = pd.read_csv("history.csv")
 
 exercises = {0: "pushups", 1: "pullups", 2: "squats", 3: "jumprope"}
 
-exercise = "pushups"
 today = datetime.date.today()
 while True:
     x = input(
         f"""
 
-        Input reps for ***{exercise.upper()}*** in this format e.g. for person z: `z5,10,3,4`
-        To change exercise, enter the workout number: {exercises}.
-        Enter 'q' to quit.
+        {json.dumps(exercises, indent=4)}
+        Example format: `0z5,10,3,4` for {exercises[0]}, user z, and reps 5,10,3,4
+        Enter 'q' to finish.
 
         """
     )
     if x == "q":
         break
-    if len(x) <= 1:
-        try:
-            exercise = exercises[int(x)]
-        except Exception as exc:
-            print(f"Invalid input: {exc}")
-    else:
-        person = x[0]
-        reps = x[1:]
-        try:
-            reps = reps.split(",")
-            reps = [int(rep) for rep in reps]
-            for rep in reps:
-                row = {
-                    "date": today,
-                    "person": person,
-                    "exercise": exercise,
-                    "reps": rep,
-                }
-                hist.loc[len(hist)] = row
-        except Exception as exc:
-            print(f"Invalid format: {exc}")
+    try:
+        exercise = exercises[int(x[0])]
+        person = x[1]
+        reps = x[2:]
+        reps = reps.split(",")
+        reps = [int(rep) for rep in reps]
+        for rep in reps:
+            row = {
+                "date": today,
+                "person": person,
+                "exercise": exercise,
+                "reps": rep,
+            }
+            hist.loc[len(hist)] = row
+    except Exception as exc:
+        print(f"Invalid format: {exc}")
 
 hist.to_csv("history.csv", index=False)
 
@@ -96,6 +91,7 @@ for subplot in subplots:
             f"{subplot.iloc[0].person}, {subplot.iloc[0].exercise}"
         )
         ax_flat[i].legend(loc="upper right")
+        ax_flat[i].grid(linestyle='-')
     i += 1
 
 plt.show()
