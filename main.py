@@ -3,6 +3,7 @@ import numpy as np
 import datetime
 from matplotlib import pyplot as plt
 import json
+import os
 
 
 hist = pd.read_csv("history.csv")
@@ -12,9 +13,9 @@ exercises = {0: "pushups", 1: "pullups", 2: "squats", 3: "jumprope"}
 today = datetime.date.today()
 while True:
     x = input(
-        f"Example format: `0z5,10,3,4` for {exercises[0]}, user z, and reps 5,10,3,4.\nEnter 'q' to save & finish.\n{json.dumps(exercises, indent=4)}\n"
+        f"Example format: `0z5,10,3,4` for {exercises[0]}, user z, and reps 5,10,3,4.\nEnter 's' to save & quit.\n{json.dumps(exercises, indent=4)}\n"
     )
-    if x == "q":
+    if x == "s":
         break
     try:
         exercise = exercises[int(x[0])]
@@ -32,9 +33,11 @@ while True:
             }
             hist.loc[len(hist)] = row
         print("✅✅✅\n")
+        os.system("paplay /usr/share/sounds/freedesktop/stereo/complete.oga&")
     except Exception as exc:
         while True:
             print(f"❌❌❌ERROR: invalid format: {exc}")
+            os.system("paplay /usr/share/sounds/freedesktop/stereo/suspend-error.oga&")
             x = input("Please enter to continue.\n")
             if x == '':
                 break
