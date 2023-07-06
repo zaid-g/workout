@@ -1,4 +1,5 @@
 import pandas as pd
+import time
 import numpy as np
 import datetime
 from matplotlib import pyplot as plt
@@ -35,12 +36,8 @@ while True:
         print("✅✅✅\n")
         os.system("paplay /usr/share/sounds/freedesktop/stereo/complete.oga&")
     except Exception as exc:
-        while True:
-            print(f"❌❌❌ERROR: invalid format: {exc}")
-            os.system("paplay /usr/share/sounds/freedesktop/stereo/suspend-error.oga&")
-            x = input("Please enter to continue.\n")
-            if x == '':
-                break
+        print(f"❌❌❌ERROR: invalid format: {exc}")
+        os.system("paplay /usr/share/sounds/freedesktop/stereo/suspend-error.oga&")
 
 # write
 hist.to_csv("history.csv", index=False)
@@ -98,4 +95,7 @@ for subplot in subplots:
         ax_flat[i].grid(linestyle='-')
     i += 1
 
-plt.show()
+plt.savefig("figure.png")
+os.system("firefox figure.png")
+time.sleep(1)
+os.system("rm figure.png")
