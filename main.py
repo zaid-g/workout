@@ -50,14 +50,14 @@ grouped = list(hist.groupby(["person", "exercise", "date"]))
 grouped = [group.reset_index() for _, group in grouped]
 
 for group in grouped:
-    rms = sum(group.reps**2) ** 0.5
+    magnitude = sum(group.reps**2) ** 0.5
     sum_ = sum(group.reps)
     scores.loc[len(scores)] = {
         "date": group.iloc[0].date,
         "person": group.iloc[0].person,
         "exercise": group.iloc[0].exercise,
-        "score": rms,
-        "score_type": "RMS",
+        "score": magnitude,
+        "score_type": "magnitude",
     }
     scores.loc[len(scores)] = {
         "date": group.iloc[0].date,
@@ -74,7 +74,7 @@ subplots = scores.groupby(["person", "exercise"])
 subplots = [group.reset_index() for _, group in subplots]
 
 fig, ax = plt.subplots(
-    nrows=int(len(subplots) ** 0.5 + 1), ncols=int(len(subplots) ** 0.5 + 1)
+    nrows=int(len(subplots) ** 0.5 + 1), ncols=int(len(subplots) ** 0.5 + 1), figsize=(12,12)
 )
 ax_flat = ax.flatten()
 
@@ -95,6 +95,7 @@ for subplot in subplots:
         ax_flat[i].grid(linestyle='-')
     i += 1
 
+plt.tight_layout()
 plt.savefig("figure.png")
 os.system("firefox figure.png")
 time.sleep(1)
