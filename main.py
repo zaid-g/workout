@@ -13,12 +13,12 @@ exercises = {0: "pushups", 1: "pullups", 2: "squats", 3: "jumprope"}
 
 today = datetime.date.today()
 while True:
-    x = input(
-        f"Example format: `0z5,10,3,4` for {exercises[0]}, user z, and reps 5,10,3,4.\nEnter 's' to save & quit.\n{json.dumps(exercises, indent=4)}\n"
-    )
-    if x == "s":
-        break
     try:
+        x = input(
+            f"Example format: `0z5,10,3,4` for {exercises[0]}, user z, and reps 5,10,3,4.\nEnter 's' to save & quit.\n{json.dumps(exercises, indent=4)}\n"
+        )
+        if x == "s":
+            break
         exercise = exercises[int(x[0])]
         person = x[1].lower()
         assert person.isalpha()
@@ -35,6 +35,9 @@ while True:
             hist.loc[len(hist)] = row
         print("✅✅✅\n")
         os.system("paplay /usr/share/sounds/freedesktop/stereo/complete.oga&")
+    except KeyboardInterrupt:
+        print("\nExiting without saving...")
+        exit()
     except Exception as exc:
         print(f"❌❌❌ERROR: invalid format: {exc}")
         os.system("paplay /usr/share/sounds/freedesktop/stereo/suspend-error.oga&")
