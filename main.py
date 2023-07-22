@@ -9,7 +9,7 @@ import os
 
 hist = pd.read_csv("history.csv")
 
-exercises = {0: "pushups", 1: "pullups", 2: "squats", 3: "jumprope"}
+exercises = {0: "pushups", 1: "pullups", 2: "squats", 3: "planks"}
 
 today = datetime.date.today()
 while True:
@@ -18,6 +18,7 @@ while True:
             f"Example format: `0z5,10,3,4` for {exercises[0]}, user z, and reps 5,10,3,4.\nEnter 's' to save & quit.\n{json.dumps(exercises, indent=4)}\n"
         )
         if x == "s":
+            os.system("paplay /usr/share/sounds/freedesktop/stereo/service-logout.oga&")
             break
         exercise = exercises[int(x[0])]
         person = x[1].lower()
@@ -94,7 +95,7 @@ for subplot in subplots:
         ax_flat[i].title.set_text(
             f"{subplot.iloc[0].person}, {subplot.iloc[0].exercise}"
         )
-        ax_flat[i].legend(loc="upper right")
+        ax_flat[i].legend(loc="upper left")
         ax_flat[i].grid(linestyle='-')
     i += 1
 
