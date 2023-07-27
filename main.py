@@ -77,6 +77,7 @@ for group in grouped:
 subplots = scores.groupby(["person", "exercise"])
 subplots = [group.reset_index() for _, group in subplots]
 
+plt.clf()
 fig, ax = plt.subplots(
     nrows=int(len(subplots) ** 0.5 + 1), ncols=int(len(subplots) ** 0.5 + 1), figsize=(12,12)
 )
