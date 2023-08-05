@@ -7,7 +7,7 @@ import json
 import os
 
 
-hist = pd.read_csv("history.csv")
+hist = pd.read_csv("history_sets.csv")
 
 exercises = {0: "pushups", 1: "pullups", 2: "squats", 3: "planks"}
 
@@ -44,7 +44,7 @@ while True:
         os.system("paplay /usr/share/sounds/freedesktop/stereo/suspend-error.oga&")
 
 # write
-hist.to_csv("history.csv", index=False)
+hist.to_csv("history_sets.csv", index=False)
 
 # %% -------- [calculate score for each person and exercise] ----------:
 
