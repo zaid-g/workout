@@ -14,6 +14,8 @@ def start_exercise():
 #workout = [["pullups", 4, 4], ["pushups", 4, 4], ["squats/planks", 4, 2]] # debug
 workout = [["pullups", 180, 5], ["pushups", 180, 5], ["squats/planks", 180, 2]]
 
+time.sleep(20)
+
 new_exercise_flag = True
 for exercise in workout:
     while exercise[2] > 0:
