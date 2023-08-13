@@ -91,13 +91,14 @@ for subplot in subplots:
         x = subsubplot.date
         y = subsubplot.score
         label = subsubplot.iloc[0].score_type
-        ax_flat[i].plot(x, y,  '-.', label=label)
-        ax_flat[i].set_ylabel("score")
-        ax_flat[i].title.set_text(
-            f"{subplot.iloc[0].person}, {subplot.iloc[0].exercise}"
-        )
-        ax_flat[i].legend(loc="upper left")
-        ax_flat[i].grid(linestyle='-')
+        ax_flat[i].plot(pd.to_datetime(x), y, '-.', marker='s', label=label)
+    ax_flat[i].set_ylabel("score")
+    ax_flat[i].title.set_text(
+        f"{subplot.iloc[0].person}, {subplot.iloc[0].exercise}"
+    )
+    ax_flat[i].grid(linestyle='-')
+    ax_flat[i].legend(loc="upper left")
+    ax_flat[i].tick_params(axis='x', rotation=90)
     i += 1
 
 plt.tight_layout()
