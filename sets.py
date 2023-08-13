@@ -44,7 +44,6 @@ while True:
         os.system("paplay /usr/share/sounds/freedesktop/stereo/suspend-error.oga&")
 
 # write
-import ipdb; ipdb.set_trace()
 hist.sort_values(by=["date", "person", "exercise"], inplace=True)
 hist.to_csv("history_sets.csv", index=False)
 
