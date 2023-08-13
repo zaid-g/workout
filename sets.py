@@ -11,7 +11,7 @@ hist = pd.read_csv("history_sets.csv")
 
 exercises = {0: "pushups", 1: "pullups", 2: "squats", 3: "planks"}
 
-today = datetime.date.today()
+today = str(datetime.date.today())
 while True:
     try:
         x = input(
@@ -44,6 +44,8 @@ while True:
         os.system("paplay /usr/share/sounds/freedesktop/stereo/suspend-error.oga&")
 
 # write
+import ipdb; ipdb.set_trace()
+hist.sort_values(by=["date", "person", "exercise"], inplace=True)
 hist.to_csv("history_sets.csv", index=False)
 
 # %% -------- [calculate score for each person and exercise] ----------:
@@ -77,8 +79,6 @@ for group in grouped:
 subplots = scores.groupby(["person", "exercise"])
 subplots = [group.reset_index() for _, group in subplots]
 
-plt.clf()
-plt.cla()
 fig, ax = plt.subplots(
     nrows=int(len(subplots) ** 0.5 + 1), ncols=int(len(subplots) ** 0.5 + 1), figsize=(12,12)
 )
@@ -106,5 +106,3 @@ plt.savefig("figure.png")
 os.system("firefox figure.png")
 time.sleep(1)
 os.system("rm figure.png")
-plt.clf()
-plt.cla()
