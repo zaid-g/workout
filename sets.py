@@ -1,4 +1,5 @@
 import pandas as pd
+import math
 import time
 import numpy as np
 import datetime
@@ -7,7 +8,8 @@ import json
 import os
 
 
-hist = pd.read_csv("history_sets.csv")
+hist_sets = pd.read_csv("history_sets.csv")
+hist_weight = pd.read_csv("history_weight.csv")
 
 exercises = {0: "pushups", 1: "pullups", 2: "squats", 3: "planks"}
 
@@ -33,7 +35,7 @@ while True:
                 "exercise": exercise,
                 "reps": rep,
             }
-            hist.loc[len(hist)] = row
+            hist_sets.loc[len(hist_sets)] = row
         print("✅✅✅\n")
         os.system("paplay /usr/share/sounds/freedesktop/stereo/complete.oga&")
     except KeyboardInterrupt:
@@ -44,14 +46,16 @@ while True:
         os.system("paplay /usr/share/sounds/freedesktop/stereo/suspend-error.oga&")
 
 # write
-hist.sort_values(by=["date", "person", "exercise"], inplace=True)
-hist.to_csv("history_sets.csv", index=False)
+hist_sets.sort_values(by=["date", "person", "exercise"], inplace=True)
+hist_weight.sort_values(by=["date", "person"], inplace=True)
+hist_sets.to_csv("history_sets.csv", index=False)
+hist_weight.to_csv("history_weight.csv", index=False)
 
 # %% -------- [calculate score for each person and exercise] ----------:
 
 scores = pd.DataFrame(columns=["date", "person", "exercise", "score", "score_type"])
 
-grouped = list(hist.groupby(["person", "exercise", "date"]))
+grouped = list(hist_sets.groupby(["person", "exercise", "date"]))
 grouped = [group.reset_index() for _, group in grouped]
 
 for group in grouped:
@@ -73,33 +77,48 @@ for group in grouped:
     }
 
 
-# %% -------- [plot results] ----------:
+# %% -------- [plot] ----------:
 
-subplots = scores.groupby(["person", "exercise"])
-subplots = [group.reset_index() for _, group in subplots]
+weight_subplots = hist_weight.groupby(["person"])
+weight_subplots = [group.reset_index() for _, group in weight_subplots]
+sets_subplots = scores.groupby(["person", "exercise"])
+sets_subplots = [group.reset_index() for _, group in sets_subplots]
 
 fig, ax = plt.subplots(
-    nrows=int(len(subplots) ** 0.5 + 1), ncols=int(len(subplots) ** 0.5 + 1), figsize=(12,12)
+    nrows=math.ceil((len(sets_subplots) + len(weight_subplots)) ** 0.5),
+    ncols=math.ceil((len(sets_subplots) + len(weight_subplots)) ** 0.5),
+    figsize=(12, 12),
 )
 ax_flat = ax.flatten()
 
-i = 0
-for subplot in subplots:
+# plot sets
+for i, subplot in enumerate(sets_subplots):
     subsubplots = subplot.groupby("score_type")
     subsubplots = [group.reset_index() for _, group in subsubplots]
     for subsubplot in subsubplots:
         x = subsubplot.date
         y = subsubplot.score
         label = subsubplot.iloc[0].score_type
-        ax_flat[i].plot(pd.to_datetime(x), y, '-.', marker='s', label=label)
+        ax_flat[i].plot(pd.to_datetime(x), y, "-.", marker="s", label=label)
     ax_flat[i].set_ylabel("score")
-    ax_flat[i].title.set_text(
-        f"{subplot.iloc[0].person}, {subplot.iloc[0].exercise}"
-    )
-    ax_flat[i].grid(linestyle='-')
+    ax_flat[i].title.set_text(f"{subplot.iloc[0].person}, {subplot.iloc[0].exercise}")
+    ax_flat[i].grid(linestyle="-")
     ax_flat[i].legend(loc="upper left")
-    ax_flat[i].tick_params(axis='x', rotation=90)
-    i += 1
+    ax_flat[i].tick_params(axis="x", rotation=90)
+
+# plot weight
+for i, subplot in enumerate(weight_subplots):
+    x = subplot.date
+    y = subplot.weight
+    label = "weight"
+    ax_flat[i + len(sets_subplots)].plot(
+        pd.to_datetime(x), y, "-.", marker="s", label=label
+    )
+    ax_flat[i + len(sets_subplots)].set_ylabel("weight")
+    ax_flat[i + len(sets_subplots)].title.set_text(f"{subplot.iloc[0].person}, weight (lbs)")
+    ax_flat[i + len(sets_subplots)].grid(linestyle="-")
+    ax_flat[i + len(sets_subplots)].legend(loc="upper left")
+    ax_flat[i + len(sets_subplots)].tick_params(axis="x", rotation=90)
 
 plt.tight_layout()
 plt.savefig("figure.png")
