@@ -99,7 +99,11 @@ for i, subplot in enumerate(sets_subplots):
         x = subsubplot.date
         y = subsubplot.score
         label = subsubplot.iloc[0].score_type
-        ax_flat[i].plot(pd.to_datetime(x), y, "-.", marker="s", label=label)
+        if y.iloc[-1] == max(y):
+            ax_flat[i].plot(pd.to_datetime(x.iloc[:-1]), y.iloc[:-1], "-.", marker="s", label=label)
+            ax_flat[i].plot(pd.to_datetime(x.iloc[-1]), y.iloc[-1], marker="*", color='g', markersize=11.0)
+        else:
+            ax_flat[i].plot(pd.to_datetime(x), y, "-.", marker="s", label=label)
     ax_flat[i].set_ylabel("score")
     ax_flat[i].title.set_text(f"{subplot.iloc[0].person}, {subplot.iloc[0].exercise}")
     ax_flat[i].grid(linestyle="-")
