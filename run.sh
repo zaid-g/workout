@@ -18,4 +18,4 @@ cleanup() {
 trap cleanup INT
 
 # Run the foreground job
-python3 sets.py
+python3 track.py
