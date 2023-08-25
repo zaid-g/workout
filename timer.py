@@ -1,15 +1,18 @@
 import os
 import time
 
+
 def start_set():
     for i in range(2):
         os.system("paplay /usr/share/sounds/freedesktop/stereo/complete.oga&")
         time.sleep(0.3)
 
+
 def start_exercise():
     for i in range(4):
         os.system("paplay /usr/share/sounds/freedesktop/stereo/complete.oga&")
         time.sleep(0.3)
+
 
 workout = [["pullups", 180, 5], ["pushups", 180, 5], ["squats/planks", 180, 2]]
 # workout = [["pullups", 4, 2], ["pushups", 4, 2], ["squats/planks", 4, 1]] # debug
