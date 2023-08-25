@@ -9,7 +9,9 @@ import os
 
 
 hist_sets = pd.read_csv("history_sets.csv")
-hist_weight = pd.read_csv("history_weight.csv")
+hist_weight = pd.read_csv("history_weight.csv").drop_duplicates(
+    ["date", "person"], keep="last"
+)
 
 exercises = {0: "pushups", 1: "pullups", 2: "squats", 3: "planks"}
 
@@ -17,25 +19,36 @@ today = str(datetime.date.today())
 while True:
     try:
         x = input(
-            f"Example format: `0z5,10,3,4` for {exercises[0]}, user z, and reps 5,10,3,4.\nEnter 's' to save & quit.\n{json.dumps(exercises, indent=4)}\n"
+            f"Insert weight example: `wz165` to insert for user z a weight of 165 lbs.\nInsert sets example: `0z5,10,3,4` for {exercises[0]}, user z (one character), and reps 5,10,3,4.\nEnter 's' to save & quit.\n{json.dumps(exercises, indent=4)}\n"
         )
         if x == "s":
             os.system("paplay /usr/share/sounds/freedesktop/stereo/service-logout.oga&")
             break
-        exercise = exercises[int(x[0])]
-        person = x[1].lower()
-        assert person.isalpha()
-        reps = x[2:]
-        reps = reps.split(",")
-        reps = [int(rep) for rep in reps]
-        for rep in reps:
+        if x[0] == "w":
+            person = x[1].lower()
+            assert person.isalpha()
+            weight = float(x[2:])
             row = {
                 "date": today,
                 "person": person,
-                "exercise": exercise,
-                "reps": rep,
+                "weight": weight,
             }
-            hist_sets.loc[len(hist_sets)] = row
+            hist_weight.loc[len(hist_weight)] = row
+        else:
+            exercise = exercises[int(x[0])]
+            person = x[1].lower()
+            assert person.isalpha()
+            reps = x[2:]
+            reps = reps.split(",")
+            reps = [int(rep) for rep in reps]
+            for rep in reps:
+                row = {
+                    "date": today,
+                    "person": person,
+                    "exercise": exercise,
+                    "reps": rep,
+                }
+                hist_sets.loc[len(hist_sets)] = row
         print("✅✅✅\n")
         os.system("paplay /usr/share/sounds/freedesktop/stereo/complete.oga&")
     except KeyboardInterrupt:
@@ -49,7 +62,9 @@ while True:
 hist_sets.sort_values(by=["date", "person", "exercise"], inplace=True)
 hist_weight.sort_values(by=["date", "person"], inplace=True)
 hist_sets.to_csv("history_sets.csv", index=False)
-hist_weight.to_csv("history_weight.csv", index=False)
+hist_weight.drop_duplicates(["date", "person"], keep="last").to_csv(
+    "history_weight.csv", index=False
+)
 
 # %% -------- [calculate score for each person and exercise] ----------:
 
