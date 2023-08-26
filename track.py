@@ -117,7 +117,7 @@ for i, subplot in enumerate(sets_subplots):
         ax_flat[i].plot(
             pd.to_datetime(x), y, "-.", marker="o", label=label, markersize=4
         )
-        if y.iloc[-1] == max(y):
+        if y.iloc[-1] > max(y.iloc[:-1]):
             ax_flat[i].plot(
                 pd.to_datetime(x.iloc[-1]),
                 y.iloc[-1],
