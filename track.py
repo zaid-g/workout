@@ -79,11 +79,12 @@ hist_weights = pd.read_csv("history_weight.csv").drop_duplicates(
 )
 
 today = str(datetime.date.today())
+print(
+    f"Insert weight example: `wz165` to insert for user z a weight of 165 lbs.\nInsert sets example: `0z5,10,3,4` for {exercises[0]}, user z (one character), and reps 5,10,3,4.\nEnter 's' to save & quit.\n{json.dumps(exercises, indent=4)}\n"
+)
 while True:
     try:
-        x = input(
-            f"Insert weight example: `wz165` to insert for user z a weight of 165 lbs.\nInsert sets example: `0z5,10,3,4` for {exercises[0]}, user z (one character), and reps 5,10,3,4.\nEnter 's' to save & quit.\n{json.dumps(exercises, indent=4)}\n"
-        )
+        x = input()
         if x == "s":
             os.system("paplay /usr/share/sounds/freedesktop/stereo/service-logout.oga&")
             break
@@ -112,7 +113,7 @@ while True:
                     "reps": rep,
                 }
                 hist_sets.loc[len(hist_sets)] = row
-        print("✅✅✅\n")
+        # print("✅✅✅")
         os.system("paplay /usr/share/sounds/freedesktop/stereo/complete.oga&")
     except KeyboardInterrupt:
         print("\nExiting without saving...")

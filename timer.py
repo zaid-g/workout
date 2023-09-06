@@ -17,7 +17,7 @@ def start_exercise():
 workout = [["pullups", 180, 5], ["pushups", 180, 5], ["squats/planks", 180, 2]]
 # workout = [["pullups", 4, 2], ["pushups", 4, 2], ["squats/planks", 4, 1]] # debug
 
-time.sleep(30)
+time.sleep(50)
 
 new_exercise_flag = True
 for i, exercise in enumerate(workout):
