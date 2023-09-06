@@ -7,13 +7,77 @@ from matplotlib import pyplot as plt
 import json
 import os
 
+# %% -------- [functions] ----------:
+
+
+def compute_set_groups(hist_sets):
+    scores = pd.DataFrame(columns=["date", "person", "exercise", "score", "score_type"])
+    grouped = list(hist_sets.groupby(["person", "exercise", "date"]))
+    grouped = [group.reset_index() for _, group in grouped]
+    for group in grouped:
+        magnitude = sum(group.reps**2) ** 0.5
+        sum_ = sum(group.reps)
+        scores.loc[len(scores)] = {
+            "date": group.iloc[0].date,
+            "person": group.iloc[0].person,
+            "exercise": group.iloc[0].exercise,
+            "score": magnitude,
+            "score_type": "magnitude",
+        }
+        scores.loc[len(scores)] = {
+            "date": group.iloc[0].date,
+            "person": group.iloc[0].person,
+            "exercise": group.iloc[0].exercise,
+            "score": sum_,
+            "score_type": "sum",
+        }
+    set_groups = scores.groupby(["person", "exercise"])
+    set_groups = [group.reset_index() for _, group in set_groups]
+    return set_groups
+
+
+def compute_weight_groups(hist_sets):
+    weight_groups = hist_weight.groupby(["person"])
+    weight_groups = [group.reset_index() for _, group in weight_groups]
+    return weight_groups
+
+
+def compute_target_reps_sum(set_groups, exercise_num_sets):
+    targets = []
+    for set_group in set_groups:
+        person = set_group.person.iloc[0]
+        exercise = set_group.exercise.iloc[0]
+        max_score_sum = int(max(set_group[set_group.score_type == "sum"].score))
+        target_score_sum = max_score_sum + 1
+        set_targets = [
+            int(target_score_sum / exercise_num_sets[exercise])
+        ] * exercise_num_sets[exercise]
+        remainder = target_score_sum % exercise_num_sets[exercise]
+        for i in range(1, remainder + 1):
+            set_targets[-i] += 1
+        targets.append((person, exercise, set_targets))
+    targets = pd.DataFrame(targets, columns=["person", "exercise", "reps"]).sort_values(
+        by=["person", "exercise"]
+    )
+    return targets
+
+
+# %% -------- [] ----------:
+
+
+exercises = {0: "pushups", 1: "pullups", 2: "squats", 3: "planks"}
+exercise_num_sets = {"pushups": 5, "pullups": 5, "squats": 2, "planks": 2}
 
 hist_sets = pd.read_csv("history_sets.csv")
+
+# compute what needs to be achieved to beat max by 1 rep
+target_reps = compute_target_reps_sum(compute_set_groups(hist_sets), exercise_num_sets)
+print(f"\n\n*** Target Reps *** \n\n {target_reps}\n\n")
+
 hist_weight = pd.read_csv("history_weight.csv").drop_duplicates(
     ["date", "person"], keep="last"
 )
 
-exercises = {0: "pushups", 1: "pullups", 2: "squats", 3: "planks"}
 
 today = str(datetime.date.today())
 while True:
@@ -66,48 +130,19 @@ hist_weight.drop_duplicates(["date", "person"], keep="last").to_csv(
     "history_weight.csv", index=False
 )
 
-# %% -------- [calculate score for each person and exercise] ----------:
-
-scores = pd.DataFrame(columns=["date", "person", "exercise", "score", "score_type"])
-
-grouped = list(hist_sets.groupby(["person", "exercise", "date"]))
-grouped = [group.reset_index() for _, group in grouped]
-
-for group in grouped:
-    magnitude = sum(group.reps**2) ** 0.5
-    sum_ = sum(group.reps)
-    scores.loc[len(scores)] = {
-        "date": group.iloc[0].date,
-        "person": group.iloc[0].person,
-        "exercise": group.iloc[0].exercise,
-        "score": magnitude,
-        "score_type": "magnitude",
-    }
-    scores.loc[len(scores)] = {
-        "date": group.iloc[0].date,
-        "person": group.iloc[0].person,
-        "exercise": group.iloc[0].exercise,
-        "score": sum_,
-        "score_type": "sum",
-    }
-
 
 # %% -------- [plot] ----------:
 
-weight_subplots = hist_weight.groupby(["person"])
-weight_subplots = [group.reset_index() for _, group in weight_subplots]
-sets_subplots = scores.groupby(["person", "exercise"])
-sets_subplots = [group.reset_index() for _, group in sets_subplots]
 
 fig, ax = plt.subplots(
-    nrows=math.ceil((len(sets_subplots) + len(weight_subplots)) ** 0.5),
-    ncols=math.ceil((len(sets_subplots) + len(weight_subplots)) ** 0.5),
+    nrows=math.ceil((len(set_groups) + len(weight_groups)) ** 0.5),
+    ncols=math.ceil((len(set_groups) + len(weight_groups)) ** 0.5),
     figsize=(12, 12),
 )
 ax_flat = ax.flatten()
 
 # plot sets
-for i, subplot in enumerate(sets_subplots):
+for i, subplot in enumerate(set_groups):
     subsubplots = subplot.groupby("score_type")
     subsubplots = [group.reset_index() for _, group in subsubplots]
     for subsubplot in subsubplots:
@@ -132,20 +167,20 @@ for i, subplot in enumerate(sets_subplots):
     ax_flat[i].tick_params(axis="x", rotation=90)
 
 # plot weight
-for i, subplot in enumerate(weight_subplots):
+for i, subplot in enumerate(weight_groups):
     x = subplot.date
     y = subplot.weight
     label = "weight"
-    ax_flat[i + len(sets_subplots)].plot(
+    ax_flat[i + len(set_groups)].plot(
         pd.to_datetime(x), y, "-.", marker="s", label=label
     )
-    ax_flat[i + len(sets_subplots)].set_ylabel("weight")
-    ax_flat[i + len(sets_subplots)].title.set_text(
+    ax_flat[i + len(set_groups)].set_ylabel("weight")
+    ax_flat[i + len(set_groups)].title.set_text(
         f"{subplot.iloc[0].person}, weight (lbs)"
     )
-    ax_flat[i + len(sets_subplots)].grid(linestyle="-")
-    ax_flat[i + len(sets_subplots)].legend(loc="upper left")
-    ax_flat[i + len(sets_subplots)].tick_params(axis="x", rotation=90)
+    ax_flat[i + len(set_groups)].grid(linestyle="-")
+    ax_flat[i + len(set_groups)].legend(loc="upper left")
+    ax_flat[i + len(set_groups)].tick_params(axis="x", rotation=90)
 
 plt.tight_layout()
 plt.savefig("figure.png")
