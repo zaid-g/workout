@@ -37,7 +37,7 @@ def compute_set_groups(hist_sets):
 
 
 def compute_weight_groups(hist_sets):
-    weight_groups = hist_weight.groupby(["person"])
+    weight_groups = hist_weights.groupby(["person"])
     weight_groups = [group.reset_index() for _, group in weight_groups]
     return weight_groups
 
@@ -62,7 +62,7 @@ def compute_target_reps_sum(set_groups, exercise_num_sets):
     return targets
 
 
-# %% -------- [] ----------:
+# %% -------- [TUI] ----------:
 
 
 exercises = {0: "pushups", 1: "pullups", 2: "squats", 3: "planks"}
@@ -72,9 +72,9 @@ hist_sets = pd.read_csv("history_sets.csv")
 
 # compute what needs to be achieved to beat max by 1 rep
 target_reps = compute_target_reps_sum(compute_set_groups(hist_sets), exercise_num_sets)
-print(f"\n\n*** Target Reps *** \n\n {target_reps}\n\n")
+print(f"\n*** Target Reps *** \n\n {target_reps}\n\n*** Let's go! ***\n")
 
-hist_weight = pd.read_csv("history_weight.csv").drop_duplicates(
+hist_weights = pd.read_csv("history_weight.csv").drop_duplicates(
     ["date", "person"], keep="last"
 )
 
@@ -97,7 +97,7 @@ while True:
                 "person": person,
                 "weight": weight,
             }
-            hist_weight.loc[len(hist_weight)] = row
+            hist_weights.loc[len(hist_weights)] = row
         else:
             exercise = exercises[int(x[0])]
             person = x[1].lower()
@@ -124,14 +124,17 @@ while True:
 
 # write
 hist_sets.sort_values(by=["date", "person", "exercise"], inplace=True)
-hist_weight.sort_values(by=["date", "person"], inplace=True)
+hist_weights.sort_values(by=["date", "person"], inplace=True)
 hist_sets.to_csv("history_sets.csv", index=False)
-hist_weight.drop_duplicates(["date", "person"], keep="last").to_csv(
+hist_weights.drop_duplicates(["date", "person"], keep="last").to_csv(
     "history_weight.csv", index=False
 )
 
 
-# %% -------- [plot] ----------:
+# %% -------- [plot set groups] ----------:
+
+set_groups = compute_set_groups(hist_sets)
+weight_groups = compute_weight_groups(hist_weights)
 
 
 fig, ax = plt.subplots(
