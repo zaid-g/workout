@@ -78,7 +78,6 @@ hist_weights = pd.read_csv("history_weight.csv").drop_duplicates(
     ["date", "person"], keep="last"
 )
 
-
 today = str(datetime.date.today())
 while True:
     try:
@@ -122,7 +121,7 @@ while True:
         print(f"❌❌❌ERROR: invalid format: {exc}")
         os.system("paplay /usr/share/sounds/freedesktop/stereo/suspend-error.oga&")
 
-# write
+# write to history
 hist_sets.sort_values(by=["date", "person", "exercise"], inplace=True)
 hist_weights.sort_values(by=["date", "person"], inplace=True)
 hist_sets.to_csv("history_sets.csv", index=False)
@@ -131,11 +130,10 @@ hist_weights.drop_duplicates(["date", "person"], keep="last").to_csv(
 )
 
 
-# %% -------- [plot set groups] ----------:
+# %% -------- [plot set and weight groups] ----------:
 
 set_groups = compute_set_groups(hist_sets)
 weight_groups = compute_weight_groups(hist_weights)
-
 
 fig, ax = plt.subplots(
     nrows=math.ceil((len(set_groups) + len(weight_groups)) ** 0.5),
@@ -188,5 +186,3 @@ for i, subplot in enumerate(weight_groups):
 plt.tight_layout()
 plt.savefig("figure.png")
 os.system("firefox figure.png")
-time.sleep(1)
-os.system("rm figure.png")
