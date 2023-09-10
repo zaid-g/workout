@@ -17,8 +17,8 @@ def start_next_set(i, exercise):
             os.system("paplay /usr/share/sounds/freedesktop/stereo/complete.oga&")
             time.sleep(0.3)
 
-#workout = [["warmup", 50, 1], ["pullups", 180, 5], ["pushups", 180, 5], ["squats/planks", 180, 2]]
-workout = [["warmup", 2, 1], ["pullups", 4, 3], ["pushups", 4, 2], ["squats/planks", 4, 1]] # debug
+workout = [["warmup", 50, 1], ["pullups", 180, 5], ["pushups", 180, 5], ["squats/planks", 180, 2]]
+#workout = [["warmup", 2, 1], ["pullups", 4, 3], ["pushups", 4, 2], ["squats/planks", 4, 1]] # debug
 
 new_exercise_flag = True
 for i, exercise in enumerate(workout):
