@@ -2,6 +2,8 @@ import os
 import time
 import datetime
 
+def ding():
+    os.system("paplay /usr/share/sounds/freedesktop/stereo/complete.oga&")
 
 def start_next_set(i, exercise):
     if exercise == "warmup":
@@ -10,15 +12,17 @@ def start_next_set(i, exercise):
     print(f"*** Time: {datetime.datetime.now().strftime('%H:%M:%S')} - {exercise} set {i + 1}. Go! ***")
     if i == 0:  # first set
         for i in range(4):
-            os.system("paplay /usr/share/sounds/freedesktop/stereo/complete.oga&")
+            ding()
             time.sleep(0.3)
     else:
         for i in range(2):
-            os.system("paplay /usr/share/sounds/freedesktop/stereo/complete.oga&")
+            ding()
             time.sleep(0.3)
 
 workout = [["warmup", 50, 1], ["pullups", 180, 5], ["pushups", 180, 5], ["squats/planks", 180, 2]]
 #workout = [["warmup", 2, 1], ["pullups", 4, 3], ["pushups", 4, 2], ["squats/planks", 4, 1]] # debug
+
+ding()
 
 new_exercise_flag = True
 for i, exercise in enumerate(workout):
