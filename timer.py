@@ -38,3 +38,7 @@ for i, exercise in enumerate(workout):
         ii += 1
         new_exercise_flag = False
     new_exercise_flag = True
+
+# sleep so process ID is held until program termination
+while True:
+    time.sleep(10000)
