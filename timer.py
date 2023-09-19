@@ -9,7 +9,7 @@ def start_next_set(i, exercise):
     if exercise == "warmup":
         print("*** Get ready! ***")
         return
-    print(f"*** Time: {datetime.datetime.now().strftime('%H:%M:%S')} - {exercise} set {i + 1}. Go! ***")
+    print(f"***{exercise} set {i + 1}. Go! ***")
     if i == 0:  # first set
         for i in range(4):
             ding()
