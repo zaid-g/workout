@@ -86,7 +86,10 @@ while True:
     try:
         x = input()
         if x == "s":
-            os.system("paplay /usr/share/sounds/freedesktop/stereo/service-logout.oga&")
+            try:
+                os.system("paplay /usr/share/sounds/freedesktop/stereo/service-logout.oga&")
+            except:
+                print("Audio playback not available")
             break
         if x[0] == "w":
             person = x[1].lower()
@@ -114,13 +117,19 @@ while True:
                 }
                 hist_sets.loc[len(hist_sets)] = row
         # print("✅✅✅")
-        os.system("paplay /usr/share/sounds/freedesktop/stereo/complete.oga&")
+        try:
+            os.system("paplay /usr/share/sounds/freedesktop/stereo/complete.oga&")
+        except:
+            print("Audio playback not available")
     except KeyboardInterrupt:
         print("\nExiting without saving...")
         exit()
     except Exception as exc:
         print(f"❌❌❌ERROR: invalid format: {exc}")
-        os.system("paplay /usr/share/sounds/freedesktop/stereo/suspend-error.oga&")
+        try:
+            os.system("paplay /usr/share/sounds/freedesktop/stereo/suspend-error.oga&")
+        except:
+            print("Audio playback not available")
 
 # write to history
 hist_sets.sort_values(by=["date", "person", "exercise"], inplace=True)
