@@ -22,8 +22,10 @@ def start_next_set(i, exercise):
             ding()
             time.sleep(0.3)
 
-workout = [["warmup", 50, 1], ["pullups", 180, 5], ["pushups", 180, 5], ["squats/planks", 180, 2]]
+#workout = [["warmup", 50, 1], ["pullups", 180, 5], ["pushups", 180, 5], ["squats/planks", 180, 2]]
 #workout = [["warmup", 2, 1], ["pullups", 4, 3], ["pushups", 4, 2], ["squats/planks", 4, 1]] # debug
+workout = [["warmup", 2, 1], ["pullups", 4, 3]] # debug
+#workout = [["warmup", 2, 1]] # debug
 
 ding()
 
@@ -36,12 +38,14 @@ for i, exercise in enumerate(workout):
         else:
             start_next_set(ii, exercise[0])
         if i == len(workout) - 1 and ii == exercise[2] - 1:
-            exit()
+            break
         time.sleep(exercise[1])
         ii += 1
         new_exercise_flag = False
     new_exercise_flag = True
 
-# sleep so process ID is held until program termination
+print("\n\nCompleted workout!")
+
+# sleep so PID is held until program termination, to not risk terminating an innocent process
 while True:
     time.sleep(10000)
