@@ -3,7 +3,10 @@ import time
 import datetime
 
 def ding():
-    os.system("paplay /usr/share/sounds/freedesktop/stereo/complete.oga&")
+    try:
+        os.system("paplay /usr/share/sounds/freedesktop/stereo/complete.oga&")
+    except:
+        print("Audio playback not available")
 
 def start_next_set(i, exercise):
     if exercise == "warmup":

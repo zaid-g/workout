@@ -186,4 +186,7 @@ for i, subplot in enumerate(weight_groups):
 
 plt.tight_layout()
 plt.savefig("figure.png")
-os.system("firefox figure.png")
+try:
+    os.system("firefox figure.png")
+except:
+    print("Firefox not available to view image <figure.png>. Image saved.")
