@@ -23,10 +23,10 @@ def start_next_set(i, exercise):
             ding()
             time.sleep(0.3)
 
-workout = [["warmup", 50, 1], ["pullups", 180, 5], ["pushups", 180, 5], ["squats/planks", 180, 2]]
+workout = [["warmup", 180, 1], ["pullups", 180, 5], ["pushups", 180, 5], ["squats/planks", 180, 2]]
 if len(sys.argv) == 2:
-    if sys.argv[1] == 'c': # cut
-        workout = [["warmup", 50, 1], ["pullups", 180, 3], ["pushups", 180, 3], ["squats/planks", 180, 2]]
+    if sys.argv[1] == 'c'or sys.argv[1] == 'C': # cut
+        workout = [["warmup", 180, 1], ["pullups", 180, 3], ["pushups", 180, 3], ["squats/planks", 180, 1]]
 #workout = [["warmup", 2, 1], ["pullups", 4, 3], ["pushups", 4, 2], ["squats/planks", 4, 1]] # debug
 #workout = [["warmup", 2, 1], ["pullups", 4, 3]] # debug
 #workout = [["warmup", 2, 1]] # debug
