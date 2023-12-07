@@ -12,19 +12,22 @@ import os
 
 
 def compute_exercise_groups(hist_sets, workout=None):
-    """ if workout=None, overall scores. if given non-null values, will match
-    number of sets in each exercise to compute scores """
+    """if workout=None, overall scores. if given non-null values, will match
+    number of sets in each exercise to compute scores"""
     scores = pd.DataFrame(columns=["date", "person", "exercise", "score", "score_type"])
     grouped = list(hist_sets.groupby(["person", "exercise", "date"]))
-    grouped = [group.reset_index() for _, group in grouped]
+    grouped = [
+        group.sort_values(by="reps", ascending=False).reset_index()
+        for _, group in grouped
+    ]
     for group in grouped:
         if workout == None:
             magnitude = sum(group.reps**2) ** 0.5
             sum_ = sum(group.reps)
         else:
             exercise = group.loc[0, "exercise"]
-            magnitude = sum(group.reps[0:workout[exercise]]**2) ** 0.5
-            sum_ = sum(group.reps[0:workout[exercise]])
+            magnitude = sum(group.reps[0 : workout[exercise]] ** 2) ** 0.5
+            sum_ = sum(group.reps[0 : workout[exercise]])
         scores.loc[len(scores)] = {
             "date": group.iloc[0].date,
             "person": group.iloc[0].person,
@@ -43,6 +46,7 @@ def compute_exercise_groups(hist_sets, workout=None):
     exercise_groups = [group.reset_index() for _, group in exercise_groups]
     return exercise_groups
 
+
 def compute_weight_groups(hist_sets):
     weight_groups = hist_weights.groupby(["person"])
     weight_groups = [group.reset_index() for _, group in weight_groups]
@@ -54,11 +58,11 @@ def compute_target_reps_sum(exercise_groups, workout):
     for exercise_group in exercise_groups:
         person = exercise_group.person.iloc[0]
         exercise = exercise_group.exercise.iloc[0]
-        max_score_sum = int(max(exercise_group[exercise_group.score_type == "sum"].score))
+        max_score_sum = int(
+            max(exercise_group[exercise_group.score_type == "sum"].score)
+        )
         target_score_sum = max_score_sum + 1
-        set_targets = [
-            int(target_score_sum / workout[exercise])
-        ] * workout[exercise]
+        set_targets = [int(target_score_sum / workout[exercise])] * workout[exercise]
         remainder = target_score_sum % workout[exercise]
         for i in range(1, remainder + 1):
             set_targets[-i] += 1
@@ -76,13 +80,15 @@ exercises = {0: "pushups", 1: "pullups", 2: "squats", 3: "planks"}
 # define workout (number of sets for each exercise)
 workout = {"pushups": 5, "pullups": 5, "squats": 2, "planks": 2}
 if len(sys.argv) == 2:
-    if sys.argv[1] == 'c'or sys.argv[1] == 'C': # cut
+    if sys.argv[1] == "c" or sys.argv[1] == "C":  # cut
         workout = {"pushups": 3, "pullups": 3, "squats": 1, "planks": 1}
 
 hist_sets = pd.read_csv("history_sets.csv")
 
 # compute what needs to be achieved to beat max by 1 rep
-target_reps = compute_target_reps_sum(compute_exercise_groups(hist_sets, workout), workout)
+target_reps = compute_target_reps_sum(
+    compute_exercise_groups(hist_sets, workout), workout
+)
 print(f"\n*** Target Reps *** \n\n {target_reps}\n\n*** Let's go! ***\n")
 
 hist_weights = pd.read_csv("history_weight.csv").drop_duplicates(
@@ -98,7 +104,9 @@ while True:
         x = input()
         if x == "s":
             try:
-                os.system("paplay /usr/share/sounds/freedesktop/stereo/service-logout.oga&")
+                os.system(
+                    "paplay /usr/share/sounds/freedesktop/stereo/service-logout.oga&"
+                )
             except:
                 print("Audio playback not available")
             break
