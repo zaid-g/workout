@@ -61,15 +61,20 @@ def compute_target_reps_sum(exercise_groups, workout):
         max_score_sum = int(
             max(exercise_group[exercise_group.score_type == "sum"].score)
         )
+        max_score_magnitude = max(
+            exercise_group[exercise_group.score_type == "magnitude"].score
+        )
         target_score_sum = max_score_sum + 1
         set_targets = [int(target_score_sum / workout[exercise])] * workout[exercise]
         remainder = target_score_sum % workout[exercise]
         for i in range(1, remainder + 1):
             set_targets[-i] += 1
-        targets.append((person, exercise, set_targets))
-    targets = pd.DataFrame(targets, columns=["person", "exercise", "reps"]).sort_values(
-        by=["person", "exercise"]
-    )
+        targets.append(
+            (person, exercise, set_targets, max_score_sum, max_score_magnitude)
+        )
+    targets = pd.DataFrame(
+        targets, columns=["person", "exercise", "reps", "sum", "magnitude"]
+    ).sort_values(by=["person", "exercise"])
     return targets
 
 
@@ -89,7 +94,9 @@ hist_sets = pd.read_csv("history_sets.csv")
 target_reps = compute_target_reps_sum(
     compute_exercise_groups(hist_sets, workout), workout
 )
-print(f"\n*** Target Reps *** \n\n {target_reps}\n\n*** Let's go! ***\n")
+print(
+    f"\n*** Target Reps *** \n\n {target_reps[['person', 'exercise', 'reps']]}\n\n*** Let's go! ***\n"
+)
 
 hist_weights = pd.read_csv("history_weight.csv").drop_duplicates(
     ["date", "person"], keep="last"
@@ -182,13 +189,16 @@ for i, subplot in enumerate(exercise_groups):
         ax_flat[i].plot(
             pd.to_datetime(x), y, "-.", marker="o", label=label, markersize=4
         )
-        # look back 30 days to see if achieved better score
-        if y.iloc[-1] > max(
-            subsubplot[
-                pd.to_datetime(subsubplot["date"])
-                > pd.to_datetime(subsubplot["date"].iloc[-1])
-                - datetime.timedelta(days=30)
-            ].iloc[-20:-1].score
+        person = subsubplot.loc[0, "person"]
+        exercise = subsubplot.loc[0, "exercise"]
+        score_type = subsubplot.loc[0, "score_type"]
+        # check to see if successfully beat max for workout
+        if (
+            y.iloc[-1]
+            > target_reps[
+                (target_reps["exercise"] == exercise)
+                & (target_reps["person"] == person)
+            ].iloc[0][score_type]
         ):
             ax_flat[i].plot(
                 pd.to_datetime(x.iloc[-1]),
