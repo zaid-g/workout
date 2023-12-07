@@ -182,7 +182,14 @@ for i, subplot in enumerate(exercise_groups):
         ax_flat[i].plot(
             pd.to_datetime(x), y, "-.", marker="o", label=label, markersize=4
         )
-        if y.iloc[-1] > max(y.iloc[:-1]):
+        # look back 30 days to see if achieved better score
+        if y.iloc[-1] > max(
+            subsubplot[
+                pd.to_datetime(subsubplot["date"])
+                > pd.to_datetime(subsubplot["date"].iloc[-1])
+                - datetime.timedelta(days=30)
+            ].iloc[-20:-1].score
+        ):
             ax_flat[i].plot(
                 pd.to_datetime(x.iloc[-1]),
                 y.iloc[-1],
