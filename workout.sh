@@ -7,7 +7,7 @@ python3 timer.py $1 &
 bg_pid=$!
 
 # Run the foreground job
-python3 track.py
+python3 track.py $1
 
 # terminate background job if finish (or ctrl-c)
 kill -TERM $bg_pid
